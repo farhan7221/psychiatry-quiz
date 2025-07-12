@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Psychiatric Prevention Quiz</title>
+  <style>
+    body { background-color: #f0f2f5; font-family: Arial, sans-serif; padding: 20px; }
+    .container { background-color: #fff; max-width: 800px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 36px; color: rgba(128,128,128,0.15); font-style: italic; pointer-events: none; z-index: 0; }
+    h2 { text-align: center; }
+    .question-number { text-align: right; font-weight: bold; }
+    .question { font-size: 18px; font-weight: bold; }
+    .translation { font-size: 16px; margin-bottom: 10px; }
+    .option { background-color: #eee; margin: 10px 0; padding: 10px; border-radius: 6px; cursor: pointer; }
+    .option.correct { background-color: #c8f7c5; }
+    .option.incorrect { background-color: #f7c5c5; }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    .explanation { background-color: rgba(255,255,150,0.4); border-left: 5px solid gold; padding: 10px; display: none; }
+    #nextBtn { margin-top: 20px; background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; display: none; cursor: pointer; }
+    #lastQBtn { float: right; margin-top: 10px; background-color: #444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    #question-end { display: none; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="watermark">Prepared by Dr Khalid Farhan</div>
+    <h2>IOM Prevention Advanced | الوقاية في الطب النفسي</h2>
+    <div class="question-number" id="qNumber"></div>
+    <div class="question" id="questionText"></div>
+    <div class="translation" id="questionAr"></div>
+    <div id="options"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    <div id="question-end">
+      <h2>انتهت الأسئلة</h2>
+      <p>Your Score: <span id="score" style="color:#007bff; font-weight:bold;"></span> / 12</p>
+      <p>درجتك: <span id="scoreAr" style="color:#007bff; font-weight:bold;"></span> من 12</p>
+    </div>
+    <button id="lastQBtn" onclick="goToLast()">last Q</button>
+  </div>
+  <script>
+    const questions = [{"q": "Universal preventive interventions target:", "q_ar": "ما هو هدف التدخلات الوقائية الشاملة (Universal)؟", "choices": [["Only individuals with family history", "أشخاص لديهم تاريخ عائلي", false], ["Entire population regardless of risk", "جميع السكان بغض النظر عن الخطورة", true], ["Patients with diagnosis", "المرضى المشخصين", false], ["Only high-risk groups", "المجموعات ذات الخطورة العالية فقط", false]], "explanation": "Universal interventions address the whole population, not based on individual risk.", "explanation_ar": "تستهدف التدخلات الشاملة جميع السكان دون تمييز في عوامل الخطورة."}, {"q": "According to IOM, prevention occurs:", "q_ar": "وفقًا لمعهد الطب، الوقاية تحدث:", "choices": [["After diagnosis", "بعد التشخيص", false], ["During treatment", "أثناء العلاج", false], ["Before diagnosis is established", "قبل التشخيص الرسمي", true], ["Only after relapse", "فقط بعد الانتكاس", false]], "explanation": "IOM defines prevention as intervention before clinical diagnosis is confirmed.", "explanation_ar": "تعرف IOM الوقاية بأنها التدخل قبل أن يتم تأكيد التشخيص السريري."}, {"q": "Why are universal interventions still useful?", "q_ar": "لماذا تظل التدخلات الشاملة مفيدة؟", "choices": [["They prevent relapse", "تمنع الانتكاس", false], ["They're cheaper", "أرخص", false], ["They benefit public health broadly", "تفيد الصحة العامة بشكل واسع", true], ["They're easier to implement", "أسهل في التطبيق", false]], "explanation": "Even small effects per person accumulate into a large public health benefit.", "explanation_ar": "رغم التأثير البسيط للفرد، إلا أن التأثير العام على الصحة المجتمعية يكون كبيرًا."}, {"q": "Which is a modifiable psychological risk factor?", "q_ar": "ما هو عامل الخطورة النفسي القابل للتعديل؟", "choices": [["Genetic mutation", "طفرة جينية", false], ["Poor parenting skills", "مهارات تربية ضعيفة", true], ["In utero infection", "عدوى أثناء الحمل", false], ["Ethnicity", "العرق", false]], "explanation": "Parenting skills can be improved, unlike fixed biological traits.", "explanation_ar": "يمكن تحسين مهارات الأبوة بخلاف العوامل البيولوجية الثابتة."}, {"q": "Which is an unmodifiable biological risk factor?", "q_ar": "ما هو عامل الخطورة البيولوجي غير القابل للتغيير؟", "choices": [["Childhood trauma", "صدمة الطفولة", false], ["Genetic vulnerability", "قابلية وراثية", true], ["Neglect", "الإهمال", false], ["Parental divorce", "طلاق الوالدين", false]], "explanation": "Genetics is inherent and cannot be changed.", "explanation_ar": "العوامل الوراثية موروثة ولا يمكن تغييرها."}, {"q": "Selective prevention is best exemplified by:", "q_ar": "ما أفضل مثال على الوقاية الانتقائية؟", "choices": [["Drug rehabilitation for addicts", "إعادة التأهيل للمدمنين", false], ["Media campaign for alcohol", "حملة إعلامية عن الكحول", false], ["Lifestyle counseling for obese adolescents", "إرشاد للمراهقين المصابين بالسمنة", true], ["Treatment after psychosis", "العلاج بعد الذهان", false]], "explanation": "Selective prevention targets subgroups with elevated risk, like obese youth.", "explanation_ar": "تستهدف الوقاية الانتقائية الفئات التي لديها خطر مرتفع مثل المراهقين المصابين بالسمنة."}, {"q": "Prenatal alcohol exposure causes risk due to:", "q_ar": "ما سبب الخطر الناتج عن التعرض للكحول قبل الولادة؟", "choices": [["Psychological trauma", "صدمة نفسية", false], ["Environmental neglect", "إهمال بيئي", false], ["Neurodevelopmental damage", "ضرر في نمو الجهاز العصبي", true], ["Poor nutrition", "سوء تغذية", false]], "explanation": "Alcohol disrupts fetal brain development, increasing mental health risk.", "explanation_ar": "يؤثر الكحول على نمو الدماغ الجنيني ويزيد خطر الاضطرابات النفسية."}, {"q": "Which of the following is a public health goal achievable through primary prevention in psychiatry?", "q_ar": "ما الهدف الذي يمكن تحقيقه عبر الوقاية الأولية في الطب النفسي؟", "choices": [["Suicide risk reduction", "تقليل خطر الانتحار", true], ["School dropout recovery", "استرجاع المتسربين من المدارس", false], ["Relapse rehabilitation", "إعادة تأهيل الانتكاس", false], ["Antipsychotic dose optimization", "تحسين جرعة مضادات الذهان", false]], "explanation": "Primary prevention targets risky behaviors like suicide and substance use before disorders develop.", "explanation_ar": "تستهدف الوقاية الأولية السلوكيات الخطرة مثل الانتحار وتعاطي المواد قبل حدوث الاضطرابات."}, {"q": "Indicated prevention differs from selective prevention because:", "q_ar": "بماذا تختلف الوقاية الإشارية عن الانتقائية؟", "choices": [["It treats diagnosed disorders", "تعالج الاضطرابات المشخصة", false], ["It targets entire population", "تستهدف السكان عامة", false], ["It targets early symptoms in high-risk individuals", "تستهدف أعراضًا مبكرة لدى الأفراد المعرضين للخطر", true], ["It offers no clinical benefit", "لا تقدم فائدة علاجية", false]], "explanation": "Indicated prevention focuses on early signs in high-risk individuals before full diagnosis.", "explanation_ar": "تُركز الوقاية الإشارية على الأعراض المبكرة لدى الأفراد المعرضين للخطر قبل تشخيص كامل."}, {"q": "The 'Prevention Paradox' means:", "q_ar": "ما المقصود بـ 'المفارقة الوقائية'؟", "choices": [["Prevention harms individuals", "الوقاية تضر الأفراد", false], ["Only meds work in prevention", "فقط الأدوية فعالة", false], ["Population gains > individual benefit", "الفائدة المجتمعية أكبر من الفردية", true], ["High-risk groups aren't targeted", "لا تُستهدف الفئات عالية الخطورة", false]], "explanation": "Prevention may benefit society widely, even if each individual sees little change.", "explanation_ar": "قد لا يشعر الفرد بتأثير كبير، لكن الأثر العام على المجتمع يكون ضخمًا."}, {"q": "Which of the following is an example of indicated prevention?", "q_ar": "أي من التالي يُعد مثالًا للوقاية الإشارية؟", "choices": [["Fortifying flour with folate", "إضافة حمض الفوليك للدقيق", false], ["Counseling children with early conduct issues", "إرشاد الأطفال ذوي المشكلات السلوكية المبكرة", true], ["Health education in schools", "التثقيف الصحي في المدارس", false], ["Screening asymptomatic elderly", "فحص كبار السن دون أعراض", false]], "explanation": "Intervention in children with early signs (before diagnosis) is indicated prevention.", "explanation_ar": "التدخل لدى الأطفال الذين يظهرون علامات مبكرة يُعد وقاية إشارية."}, {"q": "Which example best illustrates secondary prevention in psychiatric care?", "q_ar": "أي مثال يُظهر بوضوح الوقاية الثانوية؟", "choices": [["Providing parenting classes to all families", "تقديم دروس تربية لجميع الأسر", false], ["Crisis intervention for individuals at risk of psychosis", "التدخل في الأزمات لمن هم عرضة للذهان", true], ["Fluoridation of drinking water", "تدعيم مياه الشرب بالفلورايد", false], ["Relapse prevention in schizophrenia", "منع الانتكاس في الفصام", false]], "explanation": "Secondary prevention includes early detection and timely intervention like crisis response.", "explanation_ar": "تشمل الوقاية الثانوية الكشف المبكر والتدخل في الوقت المناسب مثل التدخل في الأزمات."}];
+    let current = 0, score = 0;
+
+    function loadQuestion(index) {
+      const q = questions[index];
+      document.getElementById("qNumber").innerText = `${index + 1} / ${questions.length}`;
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("questionAr").innerText = q.q_ar;
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+      q.choices.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerHTML = `${c[0]}<br><small>${c[1]}</small>`;
+        div.onclick = () => select(div, c[2]);
+        container.appendChild(div);
+      });
+      document.getElementById("explanationBox").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+    }
+
+    function select(el, isCorrect) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.add("disabled"));
+      if (isCorrect) {
+        el.classList.add("correct");
+        score++;
+      } else {
+        el.classList.add("incorrect");
+        const correct = [...document.querySelectorAll('.option')].find(opt =>
+          questions[current].choices.find(c => c[2] && opt.innerText.includes(c[0]))
+        );
+        correct.classList.add("correct");
+      }
+      document.getElementById("explanationBox").innerHTML =
+        `<strong>Explanation | الشرح:</strong><br>${questions[current].explanation}<br>${questions[current].explanation_ar}`;
+      document.getElementById("explanationBox").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        document.getElementById("questionText").style.display = "none";
+        document.getElementById("questionAr").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.getElementById("explanationBox").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("qNumber").style.display = "none";
+        document.getElementById("question-end").style.display = "block";
+        document.getElementById("score").innerText = score;
+        document.getElementById("scoreAr").innerText = score;
+      } else {
+        loadQuestion(current);
+      }
+    }
+
+    function goToLast() {
+      current = questions.length - 1;
+      loadQuestion(current);
+    }
+
+    loadQuestion(current);
+  </script>
+</body>
+</html>
