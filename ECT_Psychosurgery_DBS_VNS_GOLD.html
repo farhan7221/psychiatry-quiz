@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ECT Extended Topics Quiz</title>
+  <style>
+    body { background-color: #f0f2f5; font-family: Arial, sans-serif; padding: 20px; }
+    .container { background-color: #fff; max-width: 800px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 36px; color: rgba(128,128,128,0.15); font-style: italic; pointer-events: none; z-index: 0; }
+    h2 { text-align: center; }
+    .question-number { text-align: right; font-weight: bold; }
+    .question { font-size: 18px; font-weight: bold; }
+    .translation { font-size: 16px; margin-bottom: 10px; }
+    .option { background-color: #eee; margin: 10px 0; padding: 10px; border-radius: 6px; cursor: pointer; }
+    .option.correct { background-color: #c8f7c5; }
+    .option.incorrect { background-color: #f7c5c5; }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    .explanation { background-color: rgba(255,255,150,0.4); border-left: 5px solid gold; padding: 10px; display: none; }
+    #nextBtn { margin-top: 20px; background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; display: none; cursor: pointer; }
+    #lastQBtn { float: right; margin-top: 10px; background-color: #444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    #question-end { display: none; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="watermark">Prepared by Dr Khalid Farhan</div>
+    <h2>ECT Extensions | Unilateral Use, Medications, TMS, Psychosurgery</h2>
+    <div class="question-number" id="qNumber"></div>
+    <div class="question" id="questionText"></div>
+    <div class="translation" id="questionAr"></div>
+    <div id="options"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    <div id="question-end">
+      <h2>انتهت الأسئلة</h2>
+      <p>Your Score: <span id="score" style="color:#007bff; font-weight:bold;"></span> / 18</p>
+      <p>درجتك: <span id="scoreAr" style="color:#007bff; font-weight:bold;"></span> من 18</p>
+    </div>
+    <button id="lastQBtn" onclick="goToLast()">last Q</button>
+  </div>
+  <script>
+    const questions = [{"q": "Which psychosurgical procedure targets the anterior limb of the internal capsule bilaterally?", "q_ar": "أي إجراء جراحي نفسي يستهدف الطرف الأمامي من الكبسولة الداخلية بشكل ثنائي؟", "choices": [["Anterior capsulotomy", "استئصال الكبسولة الأمامية", true], ["Limbic leucotomy", "استئصال الجهاز الحوفي", false], ["Anterior cingulotomy", "استئصال الحزام الأمامي", false], ["Subcaudate tractotomy", "قطع تحت الذنبي", false]], "explanation": "Anterior capsulotomy involves bilateral lesions in the anterior limb of the internal capsule.", "explanation_ar": "يتضمن هذا الإجراء آفات جراحية ثنائية في الطرف الأمامي من الكبسولة الداخلية."}, {"q": "Which technique is a combination of subcaudate tractotomy and anterior cingulotomy?", "q_ar": "أي تقنية تدمج بين قطع تحت الذنبي واستئصال الحزام الأمامي؟", "choices": [["Anterior capsulotomy", "استئصال الكبسولة الأمامية", false], ["Limbic leucotomy", "استئصال الجهاز الحوفي", true], ["Stereotactic lesioning", "التحفيز الجراحي المحدد", false], ["Frontal lobotomy", "قطع الفص الأمامي", false]], "explanation": "Limbic leucotomy combines anterior cingulotomy and subcaudate tractotomy.", "explanation_ar": "الاستئصال الحوفي يجمع بين استئصال الحزام الأمامي وقطع تحت الذنبي."}, {"q": "Which is a common short-term side effect of modern psychosurgery?", "q_ar": "ما هو أثر جانبي شائع وقصير المدى للجراحة النفسية الحديثة؟", "choices": [["Persistent seizures", "تشنجات مستمرة", false], ["Severe amotivation", "انعدام دافع شديد", false], ["Headache and nausea", "صداع وغثيان", true], ["Personality destruction", "تدمير الشخصية", false]], "explanation": "Headache and nausea are common immediate effects post-surgery.", "explanation_ar": "الصداع والغثيان من التأثيرات المباشرة الشائعة بعد العملية."}, {"q": "Which long-term adverse effect is least likely with stereotactic psychosurgery?", "q_ar": "أي أثر جانبي طويل الأمد هو الأقل احتمالًا مع الجراحة النفسية التوضيعية؟", "choices": [["Weight gain", "زيادة الوزن", false], ["IQ decline", "انخفاض معدل الذكاء", true], ["Cognitive confusion", "تشوش معرفي", false], ["Confusion > 10 days", "تشوش لأكثر من ١٠ أيام", false]], "explanation": "Modern stereotactic techniques rarely affect IQ or long-term cognition.", "explanation_ar": "نادرًا ما تؤثر الطرق الحديثة على معدل الذكاء أو الوظائف المعرفية الطويلة."}, {"q": "What is the reported success rate of psychosurgery in carefully selected patients?", "q_ar": "ما هو معدل النجاح المُبلغ عنه للجراحة النفسية في المرضى المختارين بعناية؟", "choices": [["10–20%", "١٠–٢٠٪", false], ["30–40%", "٣٠–٤٠٪", false], ["50–70%", "٥٠–٧٠٪", true], [">90%", "أكثر من ٩٠٪", false]], "explanation": "Success rates range from 50% to 70% in selected treatment-resistant patients.", "explanation_ar": "تتراوح نسب النجاح بين ٥٠ إلى ٧٠٪ في المرضى المقاومين الذين تم اختيارهم بعناية."}, {"q": "What is a major benefit of Deep Brain Stimulation (DBS) over psychosurgery?", "q_ar": "ما هو الفارق الرئيسي لصالح DBS مقارنة بالجراحة النفسية؟", "choices": [["It induces permanent changes", "يُحدث تغييرات دائمة", false], ["It is reversible and adjustable", "قابل للعكس والتعديل", true], ["It targets more brain areas", "يستهدف مناطق دماغية أكثر", false], ["It is more invasive", "أكثر توغلاً", false]], "explanation": "DBS allows electrical control without destroying brain tissue.", "explanation_ar": "يوفر DBS تحكمًا كهربائيًا دون تدمير أنسجة الدماغ، ما يجعله أكثر أمانًا."}, {"q": "Which of the following is a common complication of DBS surgery?", "q_ar": "ما المضاعفة الشائعة لجراحة DBS؟", "choices": [["Cardiac arrhythmia", "اضطراب نظم القلب", false], ["Infection", "العدوى", true], ["Loss of vision", "فقدان البصر", false], ["Bowel obstruction", "انسداد الأمعاء", false]], "explanation": "Infection is the most common complication post-DBS.", "explanation_ar": "العدوى هي أكثر مضاعفات DBS شيوعًا."}, {"q": "DBS targeting which brain region is effective in OCD?", "q_ar": "استهداف أي منطقة دماغية بـ DBS فعال في علاج الوسواس القهري؟", "choices": [["Hippocampus", "الحُصين", false], ["Internal capsule", "الكبسولة الداخلية", true], ["Thalamus", "المهاد", false], ["Occipital lobe", "الفص القذالي", false]], "explanation": "Stimulation of internal capsule can improve OCD symptoms.", "explanation_ar": "تحفيز الكبسولة الداخلية أثبت فعالية في تخفيف أعراض الوسواس القهري."}, {"q": "What neuropsychiatric side effect is linked to DBS?", "q_ar": "ما الأثر الجانبي العصبي-النفسي المرتبط بـ DBS؟", "choices": [["Increased IQ", "ارتفاع الذكاء", false], ["Improved language", "تحسن في اللغة", false], ["Depression and impulsivity", "اكتئاب واندفاعية", true], ["Aphasia", "فقدان النطق", false]], "explanation": "Some patients develop depression, anxiety, or impulsive behavior post-DBS.", "explanation_ar": "قد يعاني بعض المرضى من اكتئاب أو سلوك اندفاعي بعد زرع DBS."}, {"q": "What is VNS primarily approved to treat?", "q_ar": "ما هو الاستخدام الرئيسي المعتمد لـ VNS؟", "choices": [["Resistant depression", "الاكتئاب المقاوم", false], ["Generalized seizures", "النوبات المعممة", false], ["Partial-onset epilepsy", "الصرع الجزئي المقاوم", true], ["Tourette's syndrome", "متلازمة توريت", false]], "explanation": "VNS is FDA-approved for treatment-resistant partial seizures.", "explanation_ar": "تمت الموافقة على VNS لعلاج نوبات الصرع الجزئية المقاومة."}, {"q": "Which neurotransmitters may be modulated by VNS?", "q_ar": "ما النواقل العصبية التي قد تتأثر بـ VNS؟", "choices": [["GABA, serotonin, norepinephrine", "جابا، سيروتونين، نورإبينفرين", true], ["Dopamine, acetylcholine", "دوبامين وأسيتيل كولين", false], ["Glutamate, insulin", "جلوتامات وإنسولين", false], ["Histamine only", "الهيستامين فقط", false]], "explanation": "Though unclear, VNS may influence serotonin, GABA, and norepinephrine.", "explanation_ar": "رغم عدم وضوح الآلية تمامًا، يُعتقد أن VNS يؤثر على السيروتونين وجابا والنورإبينفرين."}, {"q": "Which older psychosurgical technique had the highest risk of personality change and epilepsy?", "q_ar": "أي من تقنيات الجراحة النفسية القديمة ارتبط بأعلى خطر لتغير الشخصية والصرع؟", "choices": [["Frontal lobotomy", "قطع الفص الأمامي", true], ["Limbic leucotomy", "الاستئصال الحوفي", false], ["Capsulotomy", "الكبسولوتومي", false], ["Modern stereotactic cingulotomy", "الاستئصال الحزامي الحديث", false]], "explanation": "Frontal lobotomy had high adverse effects including personality flattening and seizures.", "explanation_ar": "قطع الفص الأمامي القديم كان مصحوبًا بتغيرات شخصية عميقة ومعدل صرع مرتفع."}, {"q": "Which of the following statements about stereotactic surgery is TRUE?", "q_ar": "أي من العبارات التالية صحيحة بخصوص الجراحة التوضيعية؟", "choices": [["It causes severe cognitive decline", "يسبب تدهور إدراكي شديد", false], ["It is performed without brain imaging", "يُجرى دون تصوير دماغي", false], ["It uses MRI-based targeting for precision", "يستخدم تحديد المواقع بناء على التصوير بالرنين", true], ["It is mainly cosmetic", "يهدف إلى تحسين المظهر", false]], "explanation": "Stereotactic surgery uses imaging to ensure accuracy of lesion placement.", "explanation_ar": "الجراحة التوضيعية تعتمد على الرنين المغناطيسي لتحديد مواضع دقيقة في الدماغ."}, {"q": "What is the reported mortality rate for modern psychosurgical procedures?", "q_ar": "ما هي نسبة الوفاة المرتبطة بالإجراءات الجراحية النفسية الحديثة؟", "choices": [[">2%", "أكثر من ٢٪", false], ["0.5%", "٠.٥٪", false], ["< 0.1%", "أقل من ٠.١٪", true], ["1%", "١٪", false]], "explanation": "Modern procedures have a very low mortality rate under 0.1%.", "explanation_ar": "تتميز الجراحات الحديثة بنسبة وفاة منخفضة جدًا تقل عن ٠.١٪."}, {"q": "Which structure is targeted in subcaudate tractotomy?", "q_ar": "أي بنية تُستهدف في قطع تحت الذنبي؟", "choices": [["Subthalamic nucleus", "النواة تحت المهاد", false], ["Orbital cortex below caudate nucleus", "القشرة الجبهية أمام الذنبي", true], ["Amygdala", "اللوزة الدماغية", false], ["Internal capsule", "الكبسولة الداخلية", false]], "explanation": "Subcaudate tractotomy creates lesions beneath the head of the caudate nucleus.", "explanation_ar": "يُحدث هذا الإجراء آفات تحت رأس النواة الذنبية في القشرة المدارية الأمامية."}, {"q": "What is a key neurocognitive advantage of modern stereotactic psychosurgery?", "q_ar": "ما الميزة العصبية الإدراكية الرئيسية للجراحة النفسية التوضيعية الحديثة؟", "choices": [["Improves memory formation", "تحسّن تكوين الذاكرة", false], ["No significant long-term cognitive impairment", "لا تسبب تدهور إدراكي طويل المدى", true], ["Enhances verbal fluency", "تعزز الطلاقة اللفظية", false], ["Increases IQ", "ترفع معدل الذكاء", false]], "explanation": "Cognitive outcomes post-surgery are generally preserved.", "explanation_ar": "الوظائف الإدراكية لا تتأثر بشكل كبير في الجراحة النفسية التوضيعية."}, {"q": "What DBS-related complication varies from 0 to 4.5% and is rare?", "q_ar": "أي من مضاعفات DBS تتراوح نسبتها بين ٠ و٤.٥٪ وتُعتبر نادرة؟", "choices": [["Stroke", "السكتة الدماغية", false], ["Intracerebral hemorrhage", "النزيف الدماغي", true], ["Mood swings", "تغيرات المزاج", false], ["Lead migration", "تحرك الأسلاك", false]], "explanation": "Hemorrhage risk from DBS is low and ranges from 0 to 4.5%.", "explanation_ar": "خطر النزيف المرتبط بـ DBS منخفض ويقع ضمن هذه النسبة."}, {"q": "What distinguishes VNS from DBS in terms of mechanism?", "q_ar": "ما الذي يميز VNS عن DBS من حيث الآلية؟", "choices": [["VNS uses magnetic fields", "VNS يستخدم مجالات مغناطيسية", false], ["VNS stimulates the vagus nerve externally", "يحفز VNS العصب المبهم خارجيًا", false], ["VNS modulates peripheral input via cervical vagus nerve", "يؤثر VNS على الإشارات الطرفية عبر العصب المبهم العنقي", true], ["VNS uses deep brain probes", "يستخدم VNS مجسات دماغية عميقة", false]], "explanation": "VNS acts through the cervical vagus nerve, indirectly modulating brain circuits.", "explanation_ar": "يعمل VNS عبر العصب المبهم في الرقبة ليؤثر بشكل غير مباشر على الدماغ."}];
+    let current = 0, score = 0;
+
+    function loadQuestion(index) {
+      const q = questions[index];
+      document.getElementById("qNumber").innerText = `${index + 1} / ${questions.length}`;
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("questionAr").innerText = q.q_ar;
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+      q.choices.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerHTML = `${c[0]}<br><small>${c[1]}</small>`;
+        div.onclick = () => select(div, c[2]);
+        container.appendChild(div);
+      });
+      document.getElementById("explanationBox").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+    }
+
+    function select(el, isCorrect) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.add("disabled"));
+      if (isCorrect) {
+        el.classList.add("correct");
+        score++;
+      } else {
+        el.classList.add("incorrect");
+        const correct = [...document.querySelectorAll('.option')].find(opt =>
+          questions[current].choices.find(c => c[2] && opt.innerText.includes(c[0]))
+        );
+        correct.classList.add("correct");
+      }
+      document.getElementById("explanationBox").innerHTML =
+        `<strong>Explanation | الشرح:</strong><br>${questions[current].explanation}<br>${questions[current].explanation_ar}`;
+      document.getElementById("explanationBox").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        document.getElementById("questionText").style.display = "none";
+        document.getElementById("questionAr").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.getElementById("explanationBox").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("qNumber").style.display = "none";
+        document.getElementById("question-end").style.display = "block";
+        document.getElementById("score").innerText = score;
+        document.getElementById("scoreAr").innerText = score;
+      } else {
+        loadQuestion(current);
+      }
+    }
+
+    function goToLast() {
+      current = questions.length - 1;
+      loadQuestion(current);
+    }
+
+    loadQuestion(current);
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ECT Extended Topics Quiz</title>
+  <style>
+    body { background-color: #f0f2f5; font-family: Arial, sans-serif; padding: 20px; }
+    .container { background-color: #fff; max-width: 800px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 36px; color: rgba(128,128,128,0.15); font-style: italic; pointer-events: none; z-index: 0; }
+    h2 { text-align: center; }
+    .question-number { text-align: right; font-weight: bold; }
+    .question { font-size: 18px; font-weight: bold; }
+    .translation { font-size: 16px; margin-bottom: 10px; }
+    .option { background-color: #eee; margin: 10px 0; padding: 10px; border-radius: 6px; cursor: pointer; }
+    .option.correct { background-color: #c8f7c5; }
+    .option.incorrect { background-color: #f7c5c5; }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    .explanation { background-color: rgba(255,255,150,0.4); border-left: 5px solid gold; padding: 10px; display: none; }
+    #nextBtn { margin-top: 20px; background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; display: none; cursor: pointer; }
+    #lastQBtn { float: right; margin-top: 10px; background-color: #444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    #question-end { display: none; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="watermark">Prepared by Dr Khalid Farhan</div>
+    <h2>ECT Extensions | Unilateral Use, Medications, TMS, Psychosurgery</h2>
+    <div class="question-number" id="qNumber"></div>
+    <div class="question" id="questionText"></div>
+    <div class="translation" id="questionAr"></div>
+    <div id="options"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    <div id="question-end">
+      <h2>انتهت الأسئلة</h2>
+      <p>Your Score: <span id="score" style="color:#007bff; font-weight:bold;"></span> / 10</p>
+      <p>درجتك: <span id="scoreAr" style="color:#007bff; font-weight:bold;"></span> من 10</p>
+    </div>
+    <button id="lastQBtn" onclick="goToLast()">last Q</button>
+  </div>
+  <script>
+    const questions = [{"q": "When is unilateral ECT preferred over bilateral ECT?", "q_ar": "متى يُفضل استخدام ECT الأحادي بدلاً من الثنائي؟", "choices": [["When minimizing memory impairment is important", "عند الرغبة في تقليل فقدان الذاكرة", true], ["When rapid and complete response is required", "عندما تكون الاستجابة السريعة والكاملة مطلوبة", false], ["In emergencies", "في الحالات الطارئة", false], ["Always in elderly", "دائمًا مع كبار السن", false]], "explanation": "Unilateral ECT is often chosen to reduce cognitive side effects.", "explanation_ar": "يُستخدم ECT الأحادي لتقليل التأثيرات الإدراكية وخاصة فقدان الذاكرة."}, {"q": "Which drug class raises the seizure threshold and may reduce ECT efficacy?", "q_ar": "أي من الأدوية ترفع عتبة التشنج وقد تُقلل فعالية ECT؟", "choices": [["Antipsychotics", "مضادات الذهان", false], ["Benzodiazepines", "البنزوديازيبينات", true], ["SSRIs", "مثبطات السيروتونين", false], ["Tricyclics", "ثلاثية الحلقات", false]], "explanation": "Benzodiazepines and barbiturates raise the seizure threshold.", "explanation_ar": "البنزوديازيبينات والباربيتورات ترفعان عتبة التشنج وتقللان من فعالية ECT."}, {"q": "Which drug should be suspended 24 hours before ECT?", "q_ar": "أي دواء يجب إيقافه قبل 24 ساعة من ECT؟", "choices": [["Clozapine", "كلوزابين", true], ["Fluoxetine", "فلوكسيتين", false], ["Valproate", "فالبروات", false], ["Haloperidol", "هالوبيريدول", false]], "explanation": "Clozapine is recommended to be suspended 24h pre-ECT to avoid adverse effects.", "explanation_ar": "يُنصح بإيقاف كلوزابين 24 ساعة قبل الجلسة لتقليل المضاعفات."}, {"q": "Why is lithium generally avoided before ECT?", "q_ar": "لماذا يُفضل تجنب الليثيوم قبل ECT؟", "choices": [["It lowers the seizure threshold", "يُقلل عتبة التشنج", false], ["It prolongs seizure duration", "يطيل النوبة", false], ["It increases cognitive side effects and neurotoxicity", "يزيد من التأثيرات الإدراكية والسُمية العصبية", true], ["It causes hypotension", "يسبب انخفاض ضغط الدم", false]], "explanation": "Lithium can exacerbate cognitive deficits and risk of neurotoxicity when combined with ECT.", "explanation_ar": "الليثيوم يزيد من الآثار الجانبية المعرفية واحتمال السُمية العصبية."}, {"q": "What is the primary indication for rTMS in depression?", "q_ar": "ما هو الاستخدام الأساسي لـ rTMS في الاكتئاب؟", "choices": [["First-line treatment", "علاج خط أول", false], ["Resistant depression after antidepressants fail", "الاكتئاب المقاوم بعد فشل مضادات الاكتئاب", true], ["When ECT is unavailable", "عند غياب ECT", false], ["For bipolar disorder", "للاضطراب ثنائي القطب", false]], "explanation": "rTMS is FDA-approved for major depression unresponsive to medication.", "explanation_ar": "rTMS معتمد لعلاج الاكتئاب المقاوم للأدوية."}, {"q": "How is rTMS typically administered for depression?", "q_ar": "كيف يُعطى rTMS عادةً لعلاج الاكتئاب؟", "choices": [["20 minutes once a week", "20 دقيقة مرة أسبوعيًا", false], ["30–40 minutes daily for 4+ weeks", "30–40 دقيقة يوميًا لأكثر من 4 أسابيع", true], ["Single pulse session", "جلسة نبضة واحدة", false], ["5-minute rapid burst protocol", "بروتوكول نبضات سريعة 5 دقائق", false]], "explanation": "rTMS is applied daily to DLPFC, usually left side, for clinical benefit.", "explanation_ar": "يُطبّق rTMS يوميًا على القشرة أمام الجبهية الظهرية الجانبية لتحقيق فعالية سريرية."}, {"q": "Which of the following is a side effect of TMS?", "q_ar": "أي من التالي يُعد أثرًا جانبيًا لـ TMS؟", "choices": [["Muscle paralysis", "شلل عضلي", false], ["Severe memory loss", "فقدان شديد للذاكرة", false], ["Headache and facial twitching", "صداع وتقلصات وجهية", true], ["Psychosis induction", "تحفيز الذهان", false]], "explanation": "Headaches and local twitching are common but mild and transient.", "explanation_ar": "الصداع والتقلصات الوجهية العارضة من الآثار الجانبية الشائعة والخفيفة."}, {"q": "Why is seizure risk from TMS minimal in depression treatment?", "q_ar": "لماذا يكون خطر التشنج منخفضًا مع TMS في علاج الاكتئاب؟", "choices": [["It suppresses cortical activity", "يُثبط النشاط القشري", false], ["Applied to prefrontal cortex, not motor areas", "يُطبق على القشرة الأمامية وليس الحركية", true], ["Patient is sedated", "المريض تحت تخدير", false], ["TMS is non-electromagnetic", "TMS غير كهربائي", false]], "explanation": "Stimulation of prefrontal areas rarely triggers seizures unlike motor cortex.", "explanation_ar": "تحفيز الفص الأمامي لا يُحفز نوبات مثل الفص الحركي."}, {"q": "Which condition is a valid indication for psychosurgery?", "q_ar": "ما الحالة التي تُعد مؤشرًا مقبولًا للجراحة النفسية؟", "choices": [["Mild anxiety disorder", "قلق بسيط", false], ["Treatment-resistant OCD", "الوسواس القهري المقاوم للعلاج", true], ["First-episode depression", "الاكتئاب في نوبته الأولى", false], ["Sleep disorders", "اضطرابات النوم", false]], "explanation": "Psychosurgery is reserved for severe, chronic, and treatment-resistant conditions.", "explanation_ar": "تُستخدم الجراحة النفسية فقط في الحالات المزمنة الشديدة التي لم تستجب للعلاج."}, {"q": "What is a mandatory ethical requirement before psychosurgery?", "q_ar": "ما الشرط الأخلاقي الأساسي قبل الجراحة النفسية؟", "choices": [["External medical approval", "موافقة طبية خارجية", false], ["Patient’s informed consent and competence", "موافقة مستنيرة وكفاءة المريض", true], ["Approval from psychiatrist only", "موافقة الطبيب النفسي فقط", false], ["No requirement if patient is involuntary", "لا حاجة بذلك في المرضى الإجباريين", false]], "explanation": "The patient must understand and agree to the procedure voluntarily.", "explanation_ar": "يجب أن يكون المريض واعيًا ويوافق طوعًا على الجراحة."}];
+    let current = 0, score = 0;
+
+    function loadQuestion(index) {
+      const q = questions[index];
+      document.getElementById("qNumber").innerText = `${index + 1} / ${questions.length}`;
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("questionAr").innerText = q.q_ar;
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+      q.choices.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerHTML = `${c[0]}<br><small>${c[1]}</small>`;
+        div.onclick = () => select(div, c[2]);
+        container.appendChild(div);
+      });
+      document.getElementById("explanationBox").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+    }
+
+    function select(el, isCorrect) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.add("disabled"));
+      if (isCorrect) {
+        el.classList.add("correct");
+        score++;
+      } else {
+        el.classList.add("incorrect");
+        const correct = [...document.querySelectorAll('.option')].find(opt =>
+          questions[current].choices.find(c => c[2] && opt.innerText.includes(c[0]))
+        );
+        correct.classList.add("correct");
+      }
+      document.getElementById("explanationBox").innerHTML =
+        `<strong>Explanation | الشرح:</strong><br>${questions[current].explanation}<br>${questions[current].explanation_ar}`;
+      document.getElementById("explanationBox").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        document.getElementById("questionText").style.display = "none";
+        document.getElementById("questionAr").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.getElementById("explanationBox").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("qNumber").style.display = "none";
+        document.getElementById("question-end").style.display = "block";
+        document.getElementById("score").innerText = score;
+        document.getElementById("scoreAr").innerText = score;
+      } else {
+        loadQuestion(current);
+      }
+    }
+
+    function goToLast() {
+      current = questions.length - 1;
+      loadQuestion(current);
+    }
+
+    loadQuestion(current);
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ECT Quiz</title>
+  <style>
+    body { background-color: #f0f2f5; font-family: Arial, sans-serif; padding: 20px; }
+    .container { background-color: #fff; max-width: 800px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 36px; color: rgba(128,128,128,0.15); font-style: italic; pointer-events: none; z-index: 0; }
+    h2 { text-align: center; }
+    .question-number { text-align: right; font-weight: bold; }
+    .question { font-size: 18px; font-weight: bold; }
+    .translation { font-size: 16px; margin-bottom: 10px; }
+    .option { background-color: #eee; margin: 10px 0; padding: 10px; border-radius: 6px; cursor: pointer; }
+    .option.correct { background-color: #c8f7c5; }
+    .option.incorrect { background-color: #f7c5c5; }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    .explanation { background-color: rgba(255,255,150,0.4); border-left: 5px solid gold; padding: 10px; display: none; }
+    #nextBtn { margin-top: 20px; background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; display: none; cursor: pointer; }
+    #lastQBtn { float: right; margin-top: 10px; background-color: #444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    #question-end { display: none; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="watermark">Prepared by Dr Khalid Farhan</div>
+    <h2>ECT Practical & Maintenance | الجوانب العملية والعلاج الوقائي</h2>
+    <div class="question-number" id="qNumber"></div>
+    <div class="question" id="questionText"></div>
+    <div class="translation" id="questionAr"></div>
+    <div id="options"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    <div id="question-end">
+      <h2>انتهت الأسئلة</h2>
+      <p>Your Score: <span id="score" style="color:#007bff; font-weight:bold;"></span> / 12</p>
+      <p>درجتك: <span id="scoreAr" style="color:#007bff; font-weight:bold;"></span> من 12</p>
+    </div>
+    <button id="lastQBtn" onclick="goToLast()">last Q</button>
+  </div>
+  <script>
+    const questions = [{"q": "What investigations are commonly done before starting ECT?", "q_ar": "ما الفحوصات الشائعة قبل بدء العلاج الكهربائي؟", "choices": [["Blood tests, ECG, chest X-ray", "فحوصات دم، تخطيط قلب، أشعة صدر", true], ["EEG and liver biopsy", "تخطيط دماغ وخزعة كبد", false], ["Brain MRI and PET scan", "تصوير بالرنين والبوزيترون", false], ["Only psychological scales", "مقاييس نفسية فقط", false]], "explanation": "Routine tests include FBC, U&Es, ECG, and sometimes chest X-ray.", "explanation_ar": "تشمل الفحوصات الروتينية: العد الدموي، وظائف الكلى، تخطيط القلب، وأحيانًا أشعة صدر."}, {"q": "What is the typical frequency and number of sessions in an ECT course?", "q_ar": "ما التردد وعدد الجلسات المعتاد في خطة علاج ECT؟", "choices": [["Once weekly, 3 sessions", "مرة أسبوعيًا، ٣ جلسات", false], ["Daily, 15 sessions", "يوميًا، ١٥ جلسة", false], ["Twice weekly, 6–12 sessions", "مرتين أسبوعيًا، ٦-١٢ جلسة", true], ["Three times weekly, 20 sessions", "٣ مرات أسبوعيًا، ٢٠ جلسة", false]], "explanation": "ECT is typically given twice a week, with a total of 6–12 treatments.", "explanation_ar": "يُعطى ECT عادة مرتين أسبوعيًا، ويتكون الكورس من ٦ إلى ١٢ جلسة."}, {"q": "Where are electrodes placed in bilateral ECT?", "q_ar": "أين توضع الأقطاب الكهربائية في ECT الثنائي؟", "choices": [["Both temples", "على جانبي الرأس", true], ["Only forehead", "فقط الجبهة", false], ["Occipital area", "المنطقة القذالية", false], ["One on wrist, one on scalp", "واحد على الرسغ، والآخر على فروة الرأس", false]], "explanation": "In bilateral ECT, electrodes are placed on both temples.", "explanation_ar": "توضع الأقطاب الكهربائية على جانبي الرأس في ECT الثنائي."}, {"q": "In unilateral ECT, the second electrode is placed where?", "q_ar": "في ECT الأحادي، أين يُوضع القطب الثاني؟", "choices": [["Contralateral temple", "الصدغ المقابل", false], ["Vertex", "قمة الجمجمة", false], ["Parietal area over non-dominant side", "المنطقة الجدارية على الجانب غير المسيطر", true], ["Over the occipital lobe", "فوق الفص القذالي", false]], "explanation": "In unilateral ECT, one electrode is on the temple, the other on parietal area of non-dominant hemisphere.", "explanation_ar": "يوضع القطب الثاني على الجانب الجبهي والجداري من نصف الكرة غير المسيطر."}, {"q": "Why is electrode placement important in ECT?", "q_ar": "لماذا يُعد موضع الأقطاب مهمًا في ECT؟", "choices": [["It affects cosmetic appearance", "يؤثر على المظهر الخارجي", false], ["It determines seizure duration only", "يحدد فقط مدة النوبة", false], ["It affects cognitive side effects and treatment efficacy", "يؤثر على التأثيرات الإدراكية وفعالية العلاج", true], ["It influences sedation depth", "يؤثر على عمق التخدير", false]], "explanation": "Electrode position impacts memory side effects and effectiveness.", "explanation_ar": "يؤثر موضع الأقطاب على التأثيرات الإدراكية ونتائج العلاج."}, {"q": "What defines a “clinically effective” ECT seizure?", "q_ar": "ما التعريف السريري للنوبة الفعالة في ECT؟", "choices": [["Motor seizure ≥ 20 seconds", "تشنج حركي لمدة ٢٠ ثانية أو أكثر", true], ["EEG spike only", "موجة في تخطيط الدماغ فقط", false], ["Patient recollection after session", "تذكر المريض للجلسة", false], ["Confusion lasting 10 min", "تشوش لمدة ١٠ دقائق", false]], "explanation": "A seizure is considered effective if motor activity lasts at least 20 seconds.", "explanation_ar": "تُعد النوبة فعالة إذا استمرت التشنجات الحركية لمدة لا تقل عن ٢٠ ثانية."}, {"q": "What are the typical EEG phases during ECT?", "q_ar": "ما مراحل EEG النموذجية أثناء ECT؟", "choices": [["Spike → electrical silence → alpha wave", "موجة ثم صمت كهربائي ثم موجة ألفا", false], ["Build-up → spike & wave → slow waves → electrical silence", "تصاعد ثم موجات سريعة وبطيئة ثم صمت كهربائي", true], ["Flat line → burst → spike", "خط مسطح ثم اندفاع ثم موجة", false], ["Silent → sharp waves only", "صمت يتبعه موجات حادة فقط", false]], "explanation": "Typical EEG has build-up, spike/wave, slow wave, and electrical silence.", "explanation_ar": "يتكون تخطيط الدماغ من تصاعد، ثم موجات سريعة وبطيئة، ثم صمت كهربائي."}, {"q": "What’s the gold standard for monitoring effectiveness in ECT?", "q_ar": "ما المعيار الذهبي لمراقبة فعالية ECT؟", "choices": [["Blood pressure tracking", "قياس ضغط الدم", false], ["EEG monitoring", "تخطيط الدماغ", true], ["Memory testing", "اختبارات الذاكرة", false], ["Clinical interviews", "المقابلات السريرية", false]], "explanation": "EEG monitoring is the most reliable tool to assess seizure quality.", "explanation_ar": "يُعد تخطيط الدماغ المعيار الذهبي لمتابعة فعالية العلاج الكهربائي."}, {"q": "When is bilateral ECT preferred over unilateral?", "q_ar": "متى يُفضّل استخدام ECT الثنائي بدلًا من الأحادي؟", "choices": [["When slow response is acceptable", "عند قبول الاستجابة البطيئة", false], ["When rapid, complete response is needed", "عندما نحتاج إلى استجابة سريعة وكاملة", true], ["For cosmetic purposes", "لأسباب تجميلية", false], ["If patient has no memory", "إذا لم يكن لدى المريض ذاكرة", false]], "explanation": "Bilateral ECT is chosen for speed and completeness of effect.", "explanation_ar": "يُفضل ECT الثنائي عندما تكون الحاجة لاستجابة سريعة وكاملة."}, {"q": "Which of the following favors choosing bilateral ECT?", "q_ar": "أي مما يلي يُرجّح استخدام ECT الثنائي؟", "choices": [["History of seizures", "تاريخ نوبات", false], ["Uncooperative patient", "مريض غير متعاون", false], ["Previous good response without memory issues", "استجابة جيدة سابقة بدون مشاكل ذاكرة", true], ["Poor nutritional status", "سوء التغذية", false]], "explanation": "Previous positive response without cognitive side effects supports bilateral use.", "explanation_ar": "الاستجابة الجيدة السابقة دون مشاكل ذاكرة تُرجّح استخدام ECT الثنائي."}, {"q": "When should maintenance ECT be considered?", "q_ar": "متى يُنصح بالنظر في العلاج الكهربائي الوقائي؟", "choices": [["After full cure", "بعد الشفاء التام", false], ["During acute mania", "أثناء الهوس الحاد", false], ["After early relapse or intolerance to meds", "بعد انتكاس مبكر أو عدم تحمل الأدوية", true], ["As a first-line always", "دائمًا كخيار أول", false]], "explanation": "Maintenance ECT is for early relapse or drug intolerance.", "explanation_ar": "يُستخدم العلاج الوقائي عند الانتكاس المبكر أو عدم تحمل العلاج الدوائي."}, {"q": "Which patient factor supports safe maintenance ECT?", "q_ar": "أي من العوامل التالية يدعم تطبيق ECT الوقائي بشكل آمن؟", "choices": [["Unpredictable mood", "مزاج غير متوقع", false], ["Patient in denial", "مريض رافض للعلاج", false], ["Patient’s attitude and life setup is suitable", "الظروف والموقف الإيجابي للمريض", true], ["Lack of support system", "غياب الدعم الاجتماعي", false]], "explanation": "Positive attitude and suitable environment enhance safety of maintenance ECT.", "explanation_ar": "تُعزز الظروف المناسبة والموقف الإيجابي من سلامة تطبيق ECT الوقائي."}];
+    let current = 0, score = 0;
+
+    function loadQuestion(index) {
+      const q = questions[index];
+      document.getElementById("qNumber").innerText = `${index + 1} / ${questions.length}`;
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("questionAr").innerText = q.q_ar;
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+      q.choices.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerHTML = `${c[0]}<br><small>${c[1]}</small>`;
+        div.onclick = () => select(div, c[2]);
+        container.appendChild(div);
+      });
+      document.getElementById("explanationBox").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+    }
+
+    function select(el, isCorrect) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.add("disabled"));
+      if (isCorrect) {
+        el.classList.add("correct");
+        score++;
+      } else {
+        el.classList.add("incorrect");
+        const correct = [...document.querySelectorAll('.option')].find(opt =>
+          questions[current].choices.find(c => c[2] && opt.innerText.includes(c[0]))
+        );
+        correct.classList.add("correct");
+      }
+      document.getElementById("explanationBox").innerHTML =
+        `<strong>Explanation | الشرح:</strong><br>${questions[current].explanation}<br>${questions[current].explanation_ar}`;
+      document.getElementById("explanationBox").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        document.getElementById("questionText").style.display = "none";
+        document.getElementById("questionAr").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.getElementById("explanationBox").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("qNumber").style.display = "none";
+        document.getElementById("question-end").style.display = "block";
+        document.getElementById("score").innerText = score;
+        document.getElementById("scoreAr").innerText = score;
+      } else {
+        loadQuestion(current);
+      }
+    }
+
+    function goToLast() {
+      current = questions.length - 1;
+      loadQuestion(current);
+    }
+
+    loadQuestion(current);
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ECT Quiz</title>
+  <style>
+    body { background-color: #f0f2f5; font-family: Arial, sans-serif; padding: 20px; }
+    .container { background-color: #fff; max-width: 800px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 36px; color: rgba(128,128,128,0.15); font-style: italic; pointer-events: none; z-index: 0; }
+    h2 { text-align: center; }
+    .question-number { text-align: right; font-weight: bold; }
+    .question { font-size: 18px; font-weight: bold; }
+    .translation { font-size: 16px; margin-bottom: 10px; }
+    .option { background-color: #eee; margin: 10px 0; padding: 10px; border-radius: 6px; cursor: pointer; }
+    .option.correct { background-color: #c8f7c5; }
+    .option.incorrect { background-color: #f7c5c5; }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    .explanation { background-color: rgba(255,255,150,0.4); border-left: 5px solid gold; padding: 10px; display: none; }
+    #nextBtn { margin-top: 20px; background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; display: none; cursor: pointer; }
+    #lastQBtn { float: right; margin-top: 10px; background-color: #444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    #question-end { display: none; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="watermark">Prepared by Dr Khalid Farhan</div>
+    <h2>ECT Contraindications & Evidence | موانع وتحليل فعالية العلاج الكهربائي</h2>
+    <div class="question-number" id="qNumber"></div>
+    <div class="question" id="questionText"></div>
+    <div class="translation" id="questionAr"></div>
+    <div id="options"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    <div id="question-end">
+      <h2>انتهت الأسئلة</h2>
+      <p>Your Score: <span id="score" style="color:#007bff; font-weight:bold;"></span> / 9</p>
+      <p>درجتك: <span id="scoreAr" style="color:#007bff; font-weight:bold;"></span> من 9</p>
+    </div>
+    <button id="lastQBtn" onclick="goToLast()">last Q</button>
+  </div>
+  <script>
+    const questions = [{"q": "Which of the following is a relative contraindication to ECT?", "q_ar": "أي من التالي يُعد مانعًا نسبيًا لاستخدام العلاج الكهربائي؟", "choices": [["Major depressive episode", "نوبة اكتئاب كبرى", false], ["Untreated cerebral aneurysm", "أم دم دماغية غير معالجة", true], ["Catatonia", "الكاتاتونيا", false], ["Pregnancy", "الحمل", false]], "explanation": "An untreated aneurysm increases the risk of intracranial bleeding with ECT.", "explanation_ar": "الأم الدماغية غير المعالجة قد تؤدي إلى نزيف داخل الجمجمة عند تطبيق التيار الكهربائي."}, {"q": "Which of the following contraindications is related to anesthesia risk?", "q_ar": "أي من الموانع التالية يرتبط بخطورة التخدير؟", "choices": [["Acute respiratory infection", "عدوى تنفسية حادة", true], ["Visual hallucinations", "هلوسة بصرية", false], ["Low appetite", "فقدان الشهية", false], ["Mania", "الهوس", false]], "explanation": "Acute infection increases anesthetic complications, so caution is required.", "explanation_ar": "العدوى التنفسية ترفع من خطورة التخدير ويجب الحذر عند استخدامها مع ECT."}, {"q": "Why is untreated deep vein thrombosis a contraindication for ECT?", "q_ar": "لماذا تُعد الجلطة الوريدية العميقة مانعًا لاستخدام ECT إن لم تُعالج؟", "choices": [["Causes memory loss", "تسبب فقدان ذاكرة", false], ["Risk of pulmonary embolism", "خطر حدوث جلطة رئوية", true], ["Reduces efficacy", "تقلل من الفعالية", false], ["Affects pulse amplitude", "تؤثر على شدة النبضة", false]], "explanation": "Muscle contractions during ECT can dislodge a clot, leading to embolism.", "explanation_ar": "التقلصات العضلية أثناء الجلسة قد تحرك الجلطة وتتسبب في انسداد رئوي."}, {"q": "How does intracerebral hemorrhage affect ECT eligibility?", "q_ar": "كيف يؤثر النزيف الدماغي على صلاحية استخدام ECT؟", "choices": [["No effect", "لا يؤثر", false], ["Increases effectiveness", "يزيد من الفعالية", false], ["It’s a relative contraindication", "يُعتبر مانعًا نسبيًا", true], ["Enhances seizure control", "يُحسّن السيطرة على النوبات", false]], "explanation": "Risk of exacerbating bleeding makes ECT dangerous in such cases.", "explanation_ar": "النزيف قد يزداد سوءًا عند استخدام التيار الكهربائي، لذلك يُعد مانعًا."}, {"q": "Which rare tumor is listed as a relative contraindication for ECT?", "q_ar": "ما الورم النادر المُدرج كمانع نسبي لـ ECT؟", "choices": [["Pheochromocytoma", "ورم القواتم", true], ["Glioblastoma", "الورم الأرومي الدبقي", false], ["Retinoblastoma", "الورم الأرومي الشبكي", false], ["Adenoma", "الورم الغدي", false]], "explanation": "Pheochromocytoma may lead to dangerous hypertensive responses with ECT.", "explanation_ar": "قد يؤدي هذا الورم إلى ارتفاع ضغط الدم بشكل خطير أثناء الجلسة."}, {"q": "What did meta-analysis conclude about real vs simulated ECT?", "q_ar": "ما خلاصة التحليل التلوي بخصوص ECT الحقيقي مقابل المزيّف؟", "choices": [["No difference", "لا فرق", false], ["Simulated more effective", "المزيّف أكثر فعالية", false], ["Real ECT more effective", "الحقيقي أكثر فعالية", true], ["Simulated safer", "المزيّف أكثر أمانًا", false]], "explanation": "Real ECT showed a significantly better response in HDRS scores.", "explanation_ar": "التحليل أظهر فرقًا واضحًا لصالح ECT الحقيقي في مقياس الاكتئاب."}, {"q": "What was found about ECT session frequency?", "q_ar": "ما الذي وُجد حول تكرار جلسات ECT؟", "choices": [["More is always better", "كلما زادت الجلسات كان أفضل", false], ["2x/week superior to 3x/week", "مرتين أفضل من ثلاث", false], ["No difference between 2x and 3x/week", "لا فرق بين مرتين وثلاث", true], ["1x/week optimal", "مرة واحدة أسبوعيًا هي الأفضل", false]], "explanation": "Studies showed no statistical difference in outcomes between frequencies.", "explanation_ar": "لم يُسجل فارق واضح بين مرتين أو ثلاث أسبوعيًا في النتائج."}, {"q": "What effect was observed with high-dose unilateral ECT?", "q_ar": "ما التأثير الذي لوحظ مع ECT أحادي الجانب بجرعة عالية؟", "choices": [["Immediate orientation", "استعادة الوعي فورًا", false], ["Slower recovery of orientation", "بطء في استعادة الوعي", true], ["Less effectiveness than simulated", "أقل فعالية من المزيّف", false], ["No effect on memory", "لا يؤثر على الذاكرة", false]], "explanation": "Patients treated with high-dose unilateral ECT took longer to regain orientation.", "explanation_ar": "استغرقت استعادة الوعي وقتًا أطول عند استخدام ECT أحادي الجانب عالي الجرعة."}, {"q": "What was the conclusion regarding pulse vs sinewave ECT?", "q_ar": "ما النتيجة بخصوص المقارنة بين نبضة مربعة و Sinewave في ECT؟", "choices": [["Sinewave superior", "Sinewave أفضل", false], ["Pulse has higher risk", "النبضة أخطر", false], ["No difference in efficacy", "لا فرق في الفعالية", true], ["Pulse gives better memory outcomes", "النبضة تقلل تأثير الذاكرة", false]], "explanation": "No significant difference in efficacy was found between both types.", "explanation_ar": "لم يُلاحظ اختلاف جوهري في الفعالية بين الشكلين."}];
+    let current = 0, score = 0;
+
+    function loadQuestion(index) {
+      const q = questions[index];
+      document.getElementById("qNumber").innerText = `${index + 1} / ${questions.length}`;
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("questionAr").innerText = q.q_ar;
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+      q.choices.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerHTML = `${c[0]}<br><small>${c[1]}</small>`;
+        div.onclick = () => select(div, c[2]);
+        container.appendChild(div);
+      });
+      document.getElementById("explanationBox").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+    }
+
+    function select(el, isCorrect) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.add("disabled"));
+      if (isCorrect) {
+        el.classList.add("correct");
+        score++;
+      } else {
+        el.classList.add("incorrect");
+        const correct = [...document.querySelectorAll('.option')].find(opt =>
+          questions[current].choices.find(c => c[2] && opt.innerText.includes(c[0]))
+        );
+        correct.classList.add("correct");
+      }
+      document.getElementById("explanationBox").innerHTML =
+        `<strong>Explanation | الشرح:</strong><br>${questions[current].explanation}<br>${questions[current].explanation_ar}`;
+      document.getElementById("explanationBox").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        document.getElementById("questionText").style.display = "none";
+        document.getElementById("questionAr").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.getElementById("explanationBox").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("qNumber").style.display = "none";
+        document.getElementById("question-end").style.display = "block";
+        document.getElementById("score").innerText = score;
+        document.getElementById("scoreAr").innerText = score;
+      } else {
+        loadQuestion(current);
+      }
+    }
+
+    function goToLast() {
+      current = questions.length - 1;
+      loadQuestion(current);
+    }
+
+    loadQuestion(current);
+  </script>
+</body>
+</html>

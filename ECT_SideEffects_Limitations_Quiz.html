@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ECT Side Effects & Limitations</title>
+  <style>
+    body { background-color: #f0f2f5; font-family: Arial, sans-serif; padding: 20px; }
+    .container { background-color: #fff; max-width: 800px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 36px; color: rgba(128,128,128,0.15); font-style: italic; pointer-events: none; z-index: 0; }
+    h2 { text-align: center; }
+    .question-number { text-align: right; font-weight: bold; }
+    .question { font-size: 18px; font-weight: bold; }
+    .translation { font-size: 16px; margin-bottom: 10px; }
+    .option { background-color: #eee; margin: 10px 0; padding: 10px; border-radius: 6px; cursor: pointer; }
+    .option.correct { background-color: #c8f7c5; }
+    .option.incorrect { background-color: #f7c5c5; }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    .explanation { background-color: rgba(255,255,150,0.4); border-left: 5px solid gold; padding: 10px; display: none; }
+    #nextBtn { margin-top: 20px; background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 6px; display: none; cursor: pointer; }
+    #lastQBtn { float: right; margin-top: 10px; background-color: #444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    #question-end { display: none; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="watermark">Prepared by Dr Khalid Farhan</div>
+    <h2>ECT Side Effects & Limitations | الآثار الجانبية والقيود للعلاج الكهربائي</h2>
+    <div class="question-number" id="qNumber"></div>
+    <div class="question" id="questionText"></div>
+    <div class="translation" id="questionAr"></div>
+    <div id="options"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    <div id="question-end">
+      <h2>انتهت الأسئلة</h2>
+      <p>Your Score: <span id="score" style="color:#007bff; font-weight:bold;"></span> / 11</p>
+      <p>درجتك: <span id="scoreAr" style="color:#007bff; font-weight:bold;"></span> من 11</p>
+    </div>
+    <button id="lastQBtn" onclick="goToLast()">last Q</button>
+  </div>
+  <script>
+    const questions = [{"q": "Which is the most commonly reported side effect of ECT?", "q_ar": "ما الأثر الجانبي الأكثر شيوعًا مع العلاج الكهربائي؟", "choices": [["Headache", "الصداع", true], ["Confusion", "التشوش", false], ["Nausea", "الغثيان", false], ["Muscle aches", "آلام عضلية", false]], "explanation": "Headache affects 48% of patients, making it the most common side effect.", "explanation_ar": "الصداع يُصيب 48٪ من المرضى، وهو الأكثر شيوعًا بين الآثار الجانبية."}, {"q": "What type of amnesia involves loss of previously learned information?", "q_ar": "ما نوع فقدان الذاكرة المرتبط بعدم تذكّر المعلومات السابقة؟", "choices": [["Anterograde amnesia", "فقدان الذاكرة الأمامي", false], ["Short-term amnesia", "فقدان الذاكرة القصير", false], ["Retrograde amnesia", "فقدان الذاكرة الرجعي", true], ["Functional amnesia", "فقدان الذاكرة الوظيفي", false]], "explanation": "Retrograde amnesia is the inability to recall previously learned events or information.", "explanation_ar": "فقدان الذاكرة الرجعي هو عدم القدرة على تذكّر المعلومات أو الأحداث السابقة."}, {"q": "Which statement about anterograde amnesia after ECT is correct?", "q_ar": "أي عبارة صحيحة حول فقدان الذاكرة الأمامي (anterograde) بعد ECT؟", "choices": [["It leads to permanent memory loss", "يؤدي إلى فقدان دائم للذاكرة", false], ["It worsens over time", "يَسوء بمرور الوقت", false], ["It improves after stopping ECT and remission of depression", "يتحسن بعد إيقاف ECT وتحسن الاكتئاب", true], ["It only occurs in older adults", "يحدث فقط لدى كبار السن", false]], "explanation": "Anterograde memory loss tends to resolve after treatment ends and symptoms remit.", "explanation_ar": "عادةً ما يتحسن فقدان الذاكرة الأمامي بعد انتهاء العلاج وتحسن الأعراض الاكتئابية."}, {"q": "Which memory is more likely to recover after ECT: older or recent events?", "q_ar": "أي الذكريات أكثر احتمالًا للعودة بعد ECT: القديمة أم الحديثة؟", "choices": [["Recent", "الحديثة", false], ["Neither", "لا شيء", false], ["Both equally", "كلاهما بنفس الدرجة", false], ["Older", "القديمة", true]], "explanation": "Older autobiographical memories are more likely to be recovered after ECT.", "explanation_ar": "الذكريات القديمة الشخصية تُستعاد بسهولة أكبر بعد ECT."}, {"q": "Does ECT cause structural brain damage or impair IQ?", "q_ar": "هل يسبب ECT تلفًا في الدماغ أو يؤثر على معدل الذكاء؟", "choices": [["Yes, always", "نعم، دائمًا", false], ["Only in elderly", "فقط لدى كبار السن", false], ["No credible evidence supports that", "لا يوجد دليل موثوق على ذلك", true], ["Yes, if given bilaterally", "نعم إذا أُعطي بشكل ثنائي", false]], "explanation": "There is no credible evidence that ECT causes structural damage or lowers IQ.", "explanation_ar": "لا يوجد دليل موثوق على أن ECT يسبب تلفًا في الدماغ أو انخفاضًا في معدل الذكاء."}, {"q": "Which of the following is a temporary cognitive effect of ECT?", "q_ar": "أي من التالي يُعد أثرًا معرفيًا مؤقتًا للعلاج الكهربائي؟", "choices": [["Severe dementia", "الخرف الشديد", false], ["Permanent confusion", "تشوش دائم", false], ["Temporary confusion", "تشوش مؤقت", true], ["Hallucinations", "هلوسات", false]], "explanation": "Temporary confusion occurs in around 27% of patients post-ECT.", "explanation_ar": "التشوش المؤقت يظهر لدى حوالي 27٪ من المرضى بعد ECT."}, {"q": "Which group is more vulnerable to memory loss from ECT?", "q_ar": "أي فئة أكثر عرضة لفقدان الذاكرة الناتج عن ECT؟", "choices": [["Teenagers", "المراهقون", false], ["Women only", "النساء فقط", false], ["Older patients", "المرضى الأكبر سنًا", true], ["No difference by age", "لا فرق حسب العمر", false]], "explanation": "Older individuals tend to experience more pronounced memory effects with ECT.", "explanation_ar": "كبار السن أكثر عرضة لفقدان الذاكرة بسبب ECT مقارنة بالفئات الأخرى."}, {"q": "What is the mortality rate of ECT compared to minor surgery?", "q_ar": "ما معدل الوفيات في ECT مقارنة بالجراحة البسيطة؟", "choices": [["Significantly higher", "أعلى بكثير", false], ["Much safer", "أكثر أمانًا بكثير", false], ["Similar to general anesthesia in minor surgery (2:100000)", "مماثل للتخدير العام في الجراحة البسيطة", true], ["Unpredictable", "غير متوقع", false]], "explanation": "The risk of death is very low and comparable to minor surgical procedures.", "explanation_ar": "معدل الوفاة منخفض جدًا ومماثل للجراحات البسيطة تحت التخدير العام."}, {"q": "Why is maintenance treatment needed after ECT?", "q_ar": "لماذا يُستخدم علاج وقائي بعد انتهاء جلسات ECT؟", "choices": [["To reduce cognitive effects", "لتقليل التأثيرات المعرفية", false], ["To prevent seizures", "لمنع التشنجات", false], ["Because the effect wears off after a few weeks in most patients", "لأن التأثير يزول بعد بضعة أسابيع لدى معظم المرضى", true], ["To increase memory recovery", "لزيادة استرجاع الذاكرة", false]], "explanation": "The benefits of ECT fade without continuation therapy, leading to relapse.", "explanation_ar": "تتلاشى فائدة ECT تدريجيًا بدون متابعة علاجية مما يؤدي إلى الانتكاس."}, {"q": "What percentage of patients relapse within 12 months of ECT?", "q_ar": "كم نسبة المرضى الذين ينتكسون خلال 12 شهرًا من ECT؟", "choices": [["20%", "٢٠٪", false], ["37.7%", "٣٧.٧٪", false], ["51.1%", "٥١.١٪", true], ["70%", "٧٠٪", false]], "explanation": "51.1% of responders relapse within 12 months even with continuation therapy.", "explanation_ar": "ينتكس ٥١.١٪ من المرضى خلال عام من العلاج حتى مع الاستمرار الدوائي."}, {"q": "Which antidepressant class has the strongest evidence in relapse prevention post-ECT?", "q_ar": "ما فئة مضادات الاكتئاب ذات أقوى دليل للوقاية من الانتكاس بعد ECT؟", "choices": [["SSRIs", "مثبطات السيروتونين", false], ["MAOIs", "مثبطات مونوأمين أوكسيديز", false], ["Tricyclic antidepressants (TCA)", "مضادات الاكتئاب ثلاثية الحلقات", true], ["SNRIs", "مثبطات السيروتونين والنورإبينفرين", false]], "explanation": "TCAs have the best evidence for relapse prevention following ECT.", "explanation_ar": "تمتلك مضادات الاكتئاب ثلاثية الحلقات أقوى الأدلة في الوقاية من الانتكاس بعد ECT."}];
+    let current = 0, score = 0;
+
+    function loadQuestion(index) {
+      const q = questions[index];
+      document.getElementById("qNumber").innerText = `${index + 1} / ${questions.length}`;
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("questionAr").innerText = q.q_ar;
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+      q.choices.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerHTML = `${c[0]}<br><small>${c[1]}</small>`;
+        div.onclick = () => select(div, c[2]);
+        container.appendChild(div);
+      });
+      document.getElementById("explanationBox").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+    }
+
+    function select(el, isCorrect) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.add("disabled"));
+      if (isCorrect) {
+        el.classList.add("correct");
+        score++;
+      } else {
+        el.classList.add("incorrect");
+        const correct = [...document.querySelectorAll('.option')].find(opt =>
+          questions[current].choices.find(c => c[2] && opt.innerText.includes(c[0]))
+        );
+        correct.classList.add("correct");
+      }
+      document.getElementById("explanationBox").innerHTML =
+        `<strong>Explanation | الشرح:</strong><br>${questions[current].explanation}<br>${questions[current].explanation_ar}`;
+      document.getElementById("explanationBox").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        document.getElementById("questionText").style.display = "none";
+        document.getElementById("questionAr").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.getElementById("explanationBox").style.display = "none";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("qNumber").style.display = "none";
+        document.getElementById("question-end").style.display = "block";
+        document.getElementById("score").innerText = score;
+        document.getElementById("scoreAr").innerText = score;
+      } else {
+        loadQuestion(current);
+      }
+    }
+
+    function goToLast() {
+      current = questions.length - 1;
+      loadQuestion(current);
+    }
+
+    loadQuestion(current);
+  </script>
+</body>
+</html>
